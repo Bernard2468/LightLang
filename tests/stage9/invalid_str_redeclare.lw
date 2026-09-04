@@ -1,0 +1,2 @@
+func int str(int n) { return n; }
+print(1);

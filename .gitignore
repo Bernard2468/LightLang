@@ -1,0 +1,19 @@
+# Build output
+build/
+lightlang
+lightlang.exe
+lightlang_sanitize
+*.o
+*.d
+
+# Compiled LightLang bytecode produced by `lightlang compile`
+*.lbc
+
+# Editor / OS noise
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Temporary directories created by the test suites
+.lltmp.*

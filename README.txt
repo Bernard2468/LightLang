@@ -30,6 +30,10 @@ Supported source-language features
 - &&, ||, !
 - if / else
 - while
+- for loops with a required initializer, condition, and update
+- break and continue
+- compound assignment: +=, -=, *=, /=, %=
+- str(...) built-in conversion from any type to string
 - print(...)
 - // comments
 - nested lexical scopes
@@ -44,6 +48,28 @@ Supported source-language features
 - compile-time argument-count and argument-type checking
 - compile-time return-type and return-path checking
 - runtime call-depth protection
+
+Diagnostics
+-----------
+Lexical and syntax errors report a line and column and print the offending source
+line with a caret under the exact token:
+
+    Syntax error at line 3, column 8 near ';': Expected ')' after value in print statement.
+        3 | print(a;
+          |        ^
+
+The parser recovers at statement boundaries, so one run reports every syntax error
+in the file rather than stopping at the first.
+
+String conversion
+-----------------
+LightLang does not silently coerce numbers to strings, because that makes
+expressions like 1 + 2 + "x" ambiguous. Use str(...) instead:
+
+    int age = 25;
+    print("Age: " + str(age));      // Age: 25
+
+    "Age: " + age                   // rejected at compile time
 
 Function syntax
 ---------------
@@ -67,7 +93,10 @@ make
 
 Equivalent direct build:
 
-g++ -std=c++17 -Wall -Wextra -Werror -pedantic main.cpp Token.cpp Lexer.cpp AST.cpp Parser.cpp Types.cpp SymbolTable.cpp SemanticAnalyzer.cpp IntermediateCode.cpp IRGenerator.cpp Optimizer.cpp Bytecode.cpp BytecodeFile.cpp BytecodeGenerator.cpp RuntimeValue.cpp VirtualMachine.cpp -o lightlang
+g++ -std=c++17 -Wall -Wextra -Werror -pedantic -Isrc src/main.cpp src/common/*.cpp src/frontend/*.cpp src/semantic/*.cpp src/ir/*.cpp src/backend/*.cpp src/runtime/*.cpp -o lightlang
+
+The -Isrc flag lets each translation unit include its dependencies by phase-qualified
+path, for example #include "frontend/Lexer.h".
 
 Command-line interface
 ----------------------
@@ -117,12 +146,19 @@ Exit status
 
 Tests
 -----
-make test
+make test                 Run every stage suite and print an aggregate summary
+make test-stage8          Run one stage suite in isolation (3 through 8)
 
-The Stage 8 package contains 115 verified tests: 87 regression tests from the earlier
-compiler stages and 28 new function/toolchain tests. Coverage includes lexical, syntax,
-semantic, IR, optimization, bytecode, persistence, recursion, call frames, return
-checking, runtime traps, and malformed-bytecode validation.
+Equivalent direct invocation, from the repository root:
+
+    bash tests/run_all.sh ./lightlang
+    bash tests/stage8/run_tests.sh ./lightlang
+
+The suite contains 343 verified assertions across stages 3 to 9. Coverage includes
+lexical, syntax, semantic, IR, optimization, bytecode, persistence, recursion, call
+frames, return checking, runtime traps, malformed-bytecode validation, loops,
+break/continue, compound assignment, the str() builtin, diagnostic columns and
+carets, parser error recovery, and common subexpression elimination.
 
 Useful examples
 ---------------
@@ -131,32 +167,59 @@ examples/control_flow.lw      while loop plus if/else
 examples/types_and_scope.lw   Types, widening, shadowing, and string operations
 examples/functions.lw         Typed functions, nested calls, and recursion
 examples/semantic_error.lw    Intentional semantic error for demonstration
+examples/loops_and_strings.lw for loops, break/continue, compound assignment, str()
+examples/first_program.lw     Scratch program
 
-Important files
----------------
-Token.*                 Token representation
-Lexer.*                 Lexical analyzer
-AST.*                   Abstract Syntax Tree
-Parser.*                Recursive-descent parser
-Types.*                 Language type definitions
-SymbolTable.*           Scoped variable symbols
-SemanticAnalyzer.*      Semantic/type and function checking
-IntermediateCode.*      Three-address IR
-IRGenerator.*           AST-to-IR lowering
-Optimizer.*             Conservative IR optimization
-Bytecode.*              Target-bytecode representation
-BytecodeGenerator.*     Optimized-IR-to-bytecode lowering
-BytecodeFile.*          Persistent .lbc serialization, loading, and validation
-RuntimeValue.*          Typed runtime values
-VirtualMachine.*        Stack-based bytecode VM with call frames
-GRAMMAR.txt              Complete LightLang grammar
-FUNCTIONS.md             Function design and constraints
-INTERMEDIATE_CODE.md     IR documentation
-OPTIMIZATION.md          Optimization documentation
-BYTECODE_VM.md           Target-code and VM documentation
-BYTECODE_FILE_FORMAT.md  Persistent .lbc specification
-DEMO_GUIDE.md            Project-presentation workflow
-PROJECT_TECHNICAL_REPORT.md  Concise implementation report
+Repository layout
+-----------------
+The source tree mirrors the compiler pipeline: each directory is one phase, so a
+file's location states when it runs.
+
+src/main.cpp                 Command-line driver and phase sequencing
+
+src/frontend/                Lexical and syntax analysis
+    Token.*                  Token representation
+    Lexer.*                  Lexical analyzer
+    AST.*                    Abstract Syntax Tree
+    Parser.*                 Recursive-descent parser
+
+src/semantic/                Semantic analysis
+    SymbolTable.*            Scoped variable symbols
+    SemanticAnalyzer.*       Semantic/type and function checking
+
+src/ir/                      Intermediate representation
+    IntermediateCode.*       Three-address IR
+    IRGenerator.*            AST-to-IR lowering
+    Optimizer.*              Conservative IR optimization
+
+src/backend/                 Target-code generation
+    Bytecode.*               Target-bytecode representation
+    BytecodeGenerator.*      Optimized-IR-to-bytecode lowering
+    BytecodeFile.*           Persistent .lbc serialization, loading, validation
+
+src/runtime/                 Execution
+    RuntimeValue.*           Typed runtime values
+    VirtualMachine.*         Stack-based bytecode VM with call frames
+
+src/common/                  Shared across phases
+    Types.*                  Language type definitions (ValueType)
+
+docs/                        Project documentation
+    GRAMMAR.txt              Complete LightLang grammar
+    FUNCTIONS.md             Function design and constraints
+    INTERMEDIATE_CODE.md     IR documentation
+    OPTIMIZATION.md          Optimization documentation
+    BYTECODE_VM.md           Target-code and VM documentation
+    BYTECODE_FILE_FORMAT.md  Persistent .lbc specification
+    DEMO_GUIDE.md            Project-presentation workflow
+    PROJECT_TECHNICAL_REPORT.md  Concise implementation report
+
+tests/                       Test suites, one directory per stage
+    run_all.sh               Runs every stage suite and aggregates results
+    stage2/ .. stage9/       Stage fixtures and run_tests.sh scripts
+
+examples/                    Demonstration programs
+build/                       Object files and dependency files (generated)
 
 Coding style
 ------------

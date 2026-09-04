@@ -1,0 +1,2 @@
+string s = "n" + 5;
+print(s);

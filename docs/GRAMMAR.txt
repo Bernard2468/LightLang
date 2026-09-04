@@ -1,0 +1,92 @@
+LightLang Stage 9 Grammar
+=========================
+
+program          -> topLevelDecl* EOF ;
+
+topLevelDecl     -> functionDecl
+                  | variableDecl
+                  | statement ;
+
+functionDecl     -> "func" type IDENTIFIER "(" parameters? ")" block ;
+parameters       -> parameter ( "," parameter )* ;
+parameter        -> type IDENTIFIER ;
+
+variableDecl     -> type IDENTIFIER ( "=" expression )? ";" ;
+
+type             -> "int"
+                  | "float"
+                  | "bool"
+                  | "string" ;
+
+statement        -> assignmentStmt
+                  | printStmt
+                  | returnStmt
+                  | ifStmt
+                  | whileStmt
+                  | forStmt
+                  | breakStmt
+                  | continueStmt
+                  | block ;
+
+assignmentStmt   -> IDENTIFIER assignOp expression ";" ;
+assignOp         -> "=" | "+=" | "-=" | "*=" | "/=" | "%=" ;
+
+printStmt        -> "print" "(" expression ")" ";" ;
+returnStmt       -> "return" expression ";" ;
+breakStmt        -> "break" ";" ;
+continueStmt     -> "continue" ";" ;
+
+ifStmt           -> "if" "(" expression ")" statement
+                    ( "else" statement )? ;
+
+whileStmt        -> "while" "(" expression ")" statement ;
+
+forStmt          -> "for" "(" forInit expression ";" forUpdate ")" statement ;
+forInit          -> variableDecl | assignmentStmt ;
+forUpdate        -> IDENTIFIER assignOp expression ;
+
+block            -> "{" localDecl* "}" ;
+localDecl        -> variableDecl | statement ;
+
+expression       -> logicalOr ;
+logicalOr        -> logicalAnd ( "||" logicalAnd )* ;
+logicalAnd       -> equality ( "&&" equality )* ;
+equality         -> comparison ( ( "==" | "!=" ) comparison )* ;
+comparison       -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term             -> factor ( ( "+" | "-" ) factor )* ;
+factor           -> unary ( ( "*" | "/" | "%" ) unary )* ;
+unary            -> ( "!" | "+" | "-" ) unary
+                  | primary ;
+primary          -> INTEGER_LITERAL
+                  | FLOAT_LITERAL
+                  | STRING_LITERAL
+                  | "true"
+                  | "false"
+                  | IDENTIFIER
+                  | functionCall
+                  | builtinCall
+                  | "(" expression ")" ;
+functionCall     -> IDENTIFIER "(" arguments? ")" ;
+builtinCall      -> "str" "(" expression ")" ;
+arguments        -> expression ( "," expression )* ;
+
+Notes
+-----
+1. Function declarations are top-level only.
+2. Every function has an explicit return type and must return a value on every path.
+3. Functions may call functions declared later and may be recursive.
+4. LightLang permits implicit widening from int to float for assignments, parameters,
+   and return values.
+5. Functions use parameters and local variables for data exchange; direct access to
+   top-level global variables from a function is intentionally disallowed.
+6. All three clauses of a for statement are required, so every for loop has an
+   explicit termination test. A variable declared in the initializer is scoped to
+   the loop and is not visible after it.
+7. 'x op= e' is exactly equivalent to 'x = x op e'; the operand type rules of the
+   underlying operator apply unchanged.
+8. 'break' and 'continue' are only valid inside a while or for loop. In a for loop
+   'continue' jumps to the update clause, so the loop always advances.
+9. 'str' is a built-in conversion, not a declared function. It accepts one value of
+   any type and yields its string form, rendered exactly as print would. It cannot
+   be redeclared. Implicit mixed-type concatenation such as "n" + 5 remains an
+   error; write "n" + str(5) instead.

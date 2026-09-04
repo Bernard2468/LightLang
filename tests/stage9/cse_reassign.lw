@@ -1,0 +1,7 @@
+func int g(int a, int b) {
+    int first = a * b;
+    a = a + 10;
+    int second = a * b;
+    return first * 1000 + second;
+}
+print(g(2, 3));

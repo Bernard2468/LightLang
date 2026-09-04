@@ -1,0 +1,41 @@
+// Stage 9 features: for loops, break, continue, compound assignment, and str().
+
+// A for loop with a compound-assignment update.
+int total = 0;
+for (int i = 1; i <= 10; i += 1) {
+    total += i;
+}
+print("sum of 1..10 = " + str(total));
+
+// continue skips an iteration but still runs the update clause.
+int odds = 0;
+for (int i = 1; i <= 10; i += 1) {
+    if (i % 2 == 0) {
+        continue;
+    }
+    odds += 1;
+}
+print("odd numbers in 1..10 = " + str(odds));
+
+// break leaves the loop early.
+int firstBig = 0;
+for (int i = 1; i < 1000; i *= 3) {
+    if (i > 50) {
+        firstBig = i;
+        break;
+    }
+}
+print("first power of 3 above 50 = " + str(firstBig));
+
+// str() converts any type, so values can be built into messages.
+float ratio = 2.5;
+bool ready = true;
+print("ratio=" + str(ratio) + " ready=" + str(ready));
+
+// A variable declared inside a loop body is fresh on every iteration.
+int n = 0;
+while (n < 3) {
+    int doubled = n * 2;
+    print("n=" + str(n) + " doubled=" + str(doubled));
+    n += 1;
+}
