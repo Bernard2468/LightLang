@@ -1,4 +1,4 @@
-LightLang Compiler - Stage 8
+LightLang Compiler - Stage 9
 ============================
 
 LightLang is a pure C++17 educational compiler for a statically typed lightweight
@@ -134,9 +134,13 @@ Execute compiled bytecode without the original source:
 
 Persistent bytecode
 -------------------
-Stage 8 writes LightLang bytecode format version 2. Version 2 adds function-call,
+LightLang writes bytecode format version 2, which adds function-call,
 parameter-binding, and return instructions. The loader remains backward-compatible
-with Stage 7 version-1 bytecode files.
+with version-1 bytecode files written by Stage 7.
+
+Stage 9 added the TO_STRING instruction for the str() conversion. It is a new opcode
+within the existing version 2 format, so previously written version-2 files still
+load unchanged.
 
 Exit status
 -----------
@@ -147,12 +151,12 @@ Exit status
 Tests
 -----
 make test                 Run every stage suite and print an aggregate summary
-make test-stage8          Run one stage suite in isolation (3 through 8)
+make test-stage9          Run one stage suite in isolation (3 through 9)
 
 Equivalent direct invocation, from the repository root:
 
     bash tests/run_all.sh ./lightlang
-    bash tests/stage8/run_tests.sh ./lightlang
+    bash tests/stage9/run_tests.sh ./lightlang
 
 The suite contains 343 verified assertions across stages 3 to 9. Coverage includes
 lexical, syntax, semantic, IR, optimization, bytecode, persistence, recursion, call
@@ -203,6 +207,7 @@ src/runtime/                 Execution
 
 src/common/                  Shared across phases
     Types.*                  Language type definitions (ValueType)
+    Diagnostic.*             Source excerpts with a caret for error reporting
 
 docs/                        Project documentation
     GRAMMAR.txt              Complete LightLang grammar
@@ -213,10 +218,13 @@ docs/                        Project documentation
     BYTECODE_FILE_FORMAT.md  Persistent .lbc specification
     DEMO_GUIDE.md            Project-presentation workflow
     PROJECT_TECHNICAL_REPORT.md  Concise implementation report
+    RELEASE_NOTES_STAGE8.md  Stage 8 release notes
 
 tests/                       Test suites, one directory per stage
     run_all.sh               Runs every stage suite and aggregates results
     stage2/ .. stage9/       Stage fixtures and run_tests.sh scripts
+    test.lw, test_invalid.lw, test_semantic_invalid.lw
+                             Shared fixtures used by several stage suites
 
 examples/                    Demonstration programs
 build/                       Object files and dependency files (generated)
