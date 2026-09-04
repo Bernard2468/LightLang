@@ -1,0 +1,5 @@
+int global = 5;
+func int readGlobal(int x) {
+    return global + x;
+}
+print(readGlobal(2));

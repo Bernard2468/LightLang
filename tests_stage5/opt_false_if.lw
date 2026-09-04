@@ -1,0 +1,5 @@
+bool flag = false;
+if (flag) {
+    print("wrong");
+}
+print("done");

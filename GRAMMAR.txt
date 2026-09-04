@@ -1,0 +1,68 @@
+LightLang Stage 8 Grammar
+=========================
+
+program          -> topLevelDecl* EOF ;
+
+topLevelDecl     -> functionDecl
+                  | variableDecl
+                  | statement ;
+
+functionDecl     -> "func" type IDENTIFIER "(" parameters? ")" block ;
+parameters       -> parameter ( "," parameter )* ;
+parameter        -> type IDENTIFIER ;
+
+variableDecl     -> type IDENTIFIER ( "=" expression )? ";" ;
+
+type             -> "int"
+                  | "float"
+                  | "bool"
+                  | "string" ;
+
+statement        -> assignmentStmt
+                  | printStmt
+                  | returnStmt
+                  | ifStmt
+                  | whileStmt
+                  | block ;
+
+assignmentStmt   -> IDENTIFIER "=" expression ";" ;
+printStmt        -> "print" "(" expression ")" ";" ;
+returnStmt       -> "return" expression ";" ;
+
+ifStmt           -> "if" "(" expression ")" statement
+                    ( "else" statement )? ;
+
+whileStmt        -> "while" "(" expression ")" statement ;
+
+block            -> "{" localDecl* "}" ;
+localDecl        -> variableDecl | statement ;
+
+expression       -> logicalOr ;
+logicalOr        -> logicalAnd ( "||" logicalAnd )* ;
+logicalAnd       -> equality ( "&&" equality )* ;
+equality         -> comparison ( ( "==" | "!=" ) comparison )* ;
+comparison       -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term             -> factor ( ( "+" | "-" ) factor )* ;
+factor           -> unary ( ( "*" | "/" | "%" ) unary )* ;
+unary            -> ( "!" | "+" | "-" ) unary
+                  | primary ;
+primary          -> INTEGER_LITERAL
+                  | FLOAT_LITERAL
+                  | STRING_LITERAL
+                  | "true"
+                  | "false"
+                  | IDENTIFIER
+                  | functionCall
+                  | "(" expression ")" ;
+functionCall     -> IDENTIFIER "(" arguments? ")" ;
+arguments        -> expression ( "," expression )* ;
+
+Notes
+-----
+1. Function declarations are top-level only.
+2. Every function has an explicit return type and must return a value on every path.
+3. Functions may call functions declared later and may be recursive.
+4. LightLang permits implicit widening from int to float for assignments, parameters,
+   and return values.
+5. Functions use parameters and local variables for data exchange; direct access to
+   top-level global variables from a function is intentionally disallowed.

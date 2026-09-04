@@ -1,0 +1,17 @@
+int age = "twenty";
+int age = 20;
+score = 50;
+bool active = 10;
+int count = 3.5;
+string name = "Ada";
+int bad = name - 1;
+if (count) {
+    print(count);
+}
+while (name) {
+    print(name);
+}
+bool mixed = name == count;
+float ok = 5;
+int notOk = ok;
+print(missing);

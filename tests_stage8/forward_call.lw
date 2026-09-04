@@ -1,0 +1,5 @@
+print(triple(7));
+
+func int triple(int x) {
+    return x * 3;
+}

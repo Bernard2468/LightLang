@@ -1,0 +1,4 @@
+func int recurse(int n) {
+    return recurse(n + 1);
+}
+print(recurse(0));

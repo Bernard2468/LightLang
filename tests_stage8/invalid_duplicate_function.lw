@@ -1,0 +1,3 @@
+func int f(int x) { return x; }
+func int f(int y) { return y; }
+print(f(1));

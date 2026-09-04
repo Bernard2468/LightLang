@@ -1,0 +1,3 @@
+string x = "a";
+int y = 1;
+string z = x + y;

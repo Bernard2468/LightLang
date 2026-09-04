@@ -1,0 +1,6 @@
+int x = 5;
+int y = -x;
+bool flag = false;
+bool inverse = !flag;
+print(y);
+print(inverse);

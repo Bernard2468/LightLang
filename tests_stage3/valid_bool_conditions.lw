@@ -1,0 +1,10 @@
+int x = 3;
+bool running = true;
+if (x > 0 && running) {
+    print(x);
+} else {
+    print(0);
+}
+while (x > 0) {
+    x = x - 1;
+}

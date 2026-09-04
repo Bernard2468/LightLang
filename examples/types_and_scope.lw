@@ -1,0 +1,15 @@
+// LightLang: types, widening, strings, bools, and lexical scope
+int count = 4;
+float average = count;
+bool ready = true;
+string message = "compiler";
+
+{
+    int count = 2;
+    print(count);
+}
+
+print(count);
+print(average);
+print(message + " ready");
+print(ready);

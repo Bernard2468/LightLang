@@ -1,0 +1,5 @@
+{
+    int local = 5;
+    print(local);
+}
+print(local);

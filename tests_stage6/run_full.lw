@@ -1,0 +1,33 @@
+int x = 3;
+int sum = 0;
+float scale = 1.5;
+string text = "";
+bool flip = false;
+
+while (x > 0) {
+    sum = sum + x;
+    scale = scale * 2.0;
+    text = text + "a";
+    flip = !flip;
+    x = x - 1;
+}
+
+int half = sum / 2;
+int remainder = sum % 4;
+int negative = -half;
+bool done = x == 0;
+
+print(sum);
+print(scale);
+print(text);
+print(flip);
+print(half);
+print(remainder);
+print(negative);
+print(done);
+
+if (done && sum >= 6) {
+    print("done");
+} else {
+    print("wrong");
+}

@@ -1,0 +1,3 @@
+// This example intentionally fails semantic analysis.
+int age = 20;
+age = "twenty";

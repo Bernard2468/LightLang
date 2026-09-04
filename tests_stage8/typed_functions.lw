@@ -1,0 +1,15 @@
+func float average(float a, float b) {
+    return (a + b) / 2.0;
+}
+
+func string greet(string name) {
+    return "Hello, " + name;
+}
+
+func bool bigger(int a, int b) {
+    return a > b;
+}
+
+print(average(4, 6));
+print(greet("LightLang"));
+print(bigger(9, 3));

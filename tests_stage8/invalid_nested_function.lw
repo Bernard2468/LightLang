@@ -1,0 +1,5 @@
+func int outer(int x) {
+    func int inner(int y) { return y; }
+    return x;
+}
+print(outer(1));

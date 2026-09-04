@@ -1,0 +1,4 @@
+int age = 10;
+print("I am ");
+print(age);
+print("years old");

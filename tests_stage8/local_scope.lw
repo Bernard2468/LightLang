@@ -1,0 +1,9 @@
+func int calculate(int x) {
+    int result = x + 1;
+    {
+        int result = x * 2;
+        print(result);
+    }
+    return result;
+}
+print(calculate(5));

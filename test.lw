@@ -1,0 +1,21 @@
+int x = 10;
+float rate = 2.5;
+bool active = true;
+string message = "Hello";
+
+float total = x + rate * 2;
+string greeting = message + " LightLang";
+
+if (total >= 15.0 && active) {
+    int x = 3;
+    print(x);
+    print(greeting);
+} else {
+    print(total);
+}
+
+while (x > 0) {
+    x = x - 1;
+}
+
+print(x);

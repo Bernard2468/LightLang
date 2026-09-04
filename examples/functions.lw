@@ -1,0 +1,14 @@
+func int factorial(int n) {
+    if (n <= 1) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
+}
+
+func string welcome(string name) {
+    return "Welcome, " + name;
+}
+
+print(welcome("LightLang"));
+print(factorial(6));

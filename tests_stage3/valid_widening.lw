@@ -1,0 +1,4 @@
+int whole = 7;
+float exact = whole;
+float result = whole + 2.5;
+print(result);

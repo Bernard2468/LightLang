@@ -1,0 +1,4 @@
+string first = "Light";
+string second = "Lang";
+string name = first + second;
+print(name);

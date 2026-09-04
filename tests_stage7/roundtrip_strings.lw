@@ -1,0 +1,4 @@
+string message = "hello world";
+string escaped = "line1\nline2\t\"quoted\"";
+print(message);
+print(escaped);

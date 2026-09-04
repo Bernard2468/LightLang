@@ -1,0 +1,6 @@
+bool flag = true;
+if (flag) {
+    print("yes");
+} else {
+    print("no");
+}

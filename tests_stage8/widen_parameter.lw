@@ -1,0 +1,4 @@
+func float half(float x) {
+    return x / 2.0;
+}
+print(half(9));

@@ -1,0 +1,2 @@
+func int bad(int x) { return "wrong"; }
+print(bad(1));

@@ -1,0 +1,2 @@
+string x = "a";
+int y = x - 1;

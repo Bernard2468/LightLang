@@ -1,0 +1,9 @@
+func int doubleIt(int x) {
+    return x * 2;
+}
+
+func int add(int a, int b) {
+    return a + b;
+}
+
+print(add(doubleIt(3), doubleIt(4)));

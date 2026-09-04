@@ -1,0 +1,7 @@
+int a;
+int b = -5 + 2 * (3 + 4);
+float c = +2.5;
+bool flag = !(b < 10) || true && false;
+string text = "ok";
+a = b % 2;
+print(text);
