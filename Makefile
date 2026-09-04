@@ -27,7 +27,9 @@ DEPS    := $(OBJECTS:.o=.d)
 
 STAGES := 3 4 5 6 7 8 9
 
-.PHONY: all test demo clean $(addprefix test-stage,$(STAGES))
+PYTHON ?= python
+
+.PHONY: all test demo ui clean $(addprefix test-stage,$(STAGES))
 
 all: $(TARGET)
 
@@ -52,6 +54,11 @@ $(addprefix test-stage,$(STAGES)): test-stage%: $(TARGET)
 
 demo: $(TARGET)
 	./$(TARGET) run examples/functions.lw
+
+# Local web playground: write LightLang source in the browser and see every
+# compiler phase. Serves on 127.0.0.1 only and drives this same executable.
+ui: $(TARGET)
+	$(PYTHON) tools/playground.py
 
 # Note: examples/*.lbc are committed demonstration artifacts and are
 # deliberately NOT removed here - deleting them would dirty the working tree.

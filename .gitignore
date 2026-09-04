@@ -17,3 +17,6 @@ Thumbs.db
 
 # Temporary directories created by the test suites
 .lltmp.*
+
+# Playground scratch files
+playground_*.lw

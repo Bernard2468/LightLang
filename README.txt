@@ -89,7 +89,11 @@ return values are used for function data exchange.
 
 Build
 -----
-make
+make            Build the compiler
+make ui         Build, then open the browser playground
+make test       Run every stage test suite
+make demo       Compile and run the functions example
+make clean      Remove build output
 
 Equivalent direct build:
 
@@ -131,6 +135,32 @@ Inspect a compiled bytecode file:
 Execute compiled bytecode without the original source:
 
     ./lightlang exec program.lbc
+
+Playground (web UI)
+-------------------
+Instead of reading pipeline output in a terminal, you can run the compiler from a
+browser page that shows every phase side by side:
+
+    make ui
+
+or directly:
+
+    python tools/playground.py [--port 8000] [--no-browser]
+
+This starts a small local server and opens a page where you write LightLang source
+on the left and inspect the result on the right, with one tab per compiler phase:
+program output, tokens, AST, symbol table, function table, three-address IR,
+optimized IR, and target bytecode. Press Run or Ctrl+Enter to compile. The example
+programs are loadable from the dropdown.
+
+The playground shells out to this same lightlang executable, so what it displays is
+exactly what the command line produces. Build the compiler first.
+
+Notes:
+- Only the Python standard library is used; there is nothing to install.
+- The server binds to 127.0.0.1 and is not reachable from the network.
+- A program that never terminates is stopped after 10 seconds instead of hanging
+  the page.
 
 Persistent bytecode
 -------------------
@@ -225,6 +255,10 @@ tests/                       Test suites, one directory per stage
     stage2/ .. stage9/       Stage fixtures and run_tests.sh scripts
     test.lw, test_invalid.lw, test_semantic_invalid.lw
                              Shared fixtures used by several stage suites
+
+tools/                       Developer tooling
+    playground.py            Local web-UI server for the compiler
+    playground.html          The playground page
 
 examples/                    Demonstration programs
 build/                       Object files and dependency files (generated)

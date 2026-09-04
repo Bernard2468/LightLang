@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LightLang Playground</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --ink: #1b1f24;
+    --muted: #5b6472;
+    --line: #d9dee6;
+    --accent: #2f6feb;
+    --ok: #1a7f4b;
+    --bad: #c0392b;
+    --warn: #9a6a00;
+    --code-bg: #fbfbfd;
+    --mono: ui-monospace, "Cascadia Mono", "Consolas", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171c;
+      --panel: #1b1f26;
+      --ink: #e6e9ef;
+      --muted: #9aa4b2;
+      --line: #2c333d;
+      --accent: #6ea1ff;
+      --ok: #4cc38a;
+      --bad: #f0776a;
+      --warn: #e0b341;
+      --code-bg: #171b21;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-size: 15px;
+    margin: 0;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  h1 span { color: var(--muted); font-weight: 400; }
+
+  button, select {
+    font: inherit;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+  button:hover, select:hover { border-color: var(--accent); }
+
+  #run {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  #run:disabled { opacity: 0.6; cursor: default; }
+
+  .spacer { flex: 1; }
+
+  .hint { color: var(--muted); font-size: 12px; }
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(320px, 44%) 1fr;
+    gap: 1px;
+    background: var(--line);
+    min-height: 0;
+  }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; grid-template-rows: 45% 1fr; }
+  }
+
+  .pane {
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .pane-head {
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Editor: a gutter of line numbers kept in sync with the textarea. */
+  .editor {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    background: var(--code-bg);
+  }
+
+  #gutter {
+    padding: 12px 8px 12px 14px;
+    text-align: right;
+    color: var(--muted);
+    font: 13px/1.6 var(--mono);
+    background: var(--code-bg);
+    user-select: none;
+    overflow: hidden;
+    white-space: pre;
+    border-right: 1px solid var(--line);
+  }
+
+  #code {
+    flex: 1;
+    border: 0;
+    outline: 0;
+    resize: none;
+    padding: 12px 14px;
+    font: 13px/1.6 var(--mono);
+    color: var(--ink);
+    background: var(--code-bg);
+    tab-size: 4;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    padding: 6px 10px 0;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .tab {
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: none;
+    border-radius: 6px 6px 0 0;
+    padding: 6px 11px;
+    font-size: 12.5px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .tab[aria-selected="true"] {
+    background: var(--code-bg);
+    border-color: var(--line);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .tab.empty { opacity: 0.45; }
+
+  .tab.error { color: var(--bad); }
+
+  #output {
+    flex: 1;
+    overflow: auto;
+    margin: 0;
+    padding: 14px;
+    font: 13px/1.55 var(--mono);
+    background: var(--code-bg);
+    white-space: pre;
+    min-height: 0;
+  }
+
+  #status {
+    padding: 9px 14px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex: none;
+  }
+
+  .dot.ok { background: var(--ok); }
+  .dot.bad { background: var(--bad); }
+  .dot.warn { background: var(--warn); }
+
+  .status-ok { color: var(--ok); }
+  .status-bad { color: var(--bad); }
+  .placeholder { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>LightLang <span>Playground</span></h1>
+  <button id="run">Run</button>
+  <select id="examples"><option value="">Load an example…</option></select>
+  <div class="spacer"></div>
+  <span class="hint">Ctrl+Enter to run</span>
+</header>
+
+<main>
+  <section class="pane">
+    <div class="pane-head">Source</div>
+    <div class="editor">
+      <div id="gutter">1</div>
+      <textarea id="code" spellcheck="false" autocomplete="off"></textarea>
+    </div>
+  </section>
+
+  <section class="pane">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <pre id="output"><span class="placeholder">Press Run to compile.</span></pre>
+    <div id="status"><span class="dot"></span><span>Ready</span></div>
+  </section>
+</main>
+
+<script>
+// Pipeline order. Each entry maps a tab label to the compiler's own banner.
+const PHASES = [
+  ["Output",     "PROGRAM OUTPUT"],
+  ["Tokens",     "TOKENS"],
+  ["AST",        "ABSTRACT SYNTAX TREE"],
+  ["Symbols",    "SYMBOL TABLE"],
+  ["Functions",  "FUNCTION TABLE"],
+  ["IR",         "THREE-ADDRESS INTERMEDIATE CODE"],
+  ["Optimized",  "OPTIMIZED THREE-ADDRESS CODE"],
+  ["Bytecode",   "TARGET BYTECODE"],
+];
+
+const ERROR_PHASES = [
+  ["Lexical errors",  "LEXICAL ERRORS"],
+  ["Syntax errors",   "SYNTAX ERRORS"],
+  ["Semantic errors", "SEMANTIC ERRORS"],
+];
+
+const STARTER = `// Welcome to the LightLang playground.
+// Edit this code and press Run (or Ctrl+Enter).
+
+int total = 0;
+for (int i = 1; i <= 10; i += 1) {
+    total += i;
+}
+print("sum of 1..10 = " + str(total));
+
+func int square(int n) {
+    return n * n;
+}
+print("square(7) = " + str(square(7)));
+`;
+
+const codeEl = document.getElementById("code");
+const gutterEl = document.getElementById("gutter");
+const tabsEl = document.getElementById("tabs");
+const outputEl = document.getElementById("output");
+const statusEl = document.getElementById("status");
+const runBtn = document.getElementById("run");
+const examplesEl = document.getElementById("examples");
+
+let sections = {};
+let activeTab = "Output";
+
+function syncGutter() {
+  const count = codeEl.value.split("\n").length;
+  let text = "";
+  for (let i = 1; i <= count; i++) text += i + "\n";
+  gutterEl.textContent = text;
+  gutterEl.scrollTop = codeEl.scrollTop;
+}
+
+codeEl.addEventListener("input", syncGutter);
+codeEl.addEventListener("scroll", () => { gutterEl.scrollTop = codeEl.scrollTop; });
+
+// Keep Tab as indentation inside the editor rather than moving focus.
+codeEl.addEventListener("keydown", (event) => {
+  if (event.key === "Tab") {
+    event.preventDefault();
+    const start = codeEl.selectionStart;
+    const end = codeEl.selectionEnd;
+    codeEl.value = codeEl.value.slice(0, start) + "    " + codeEl.value.slice(end);
+    codeEl.selectionStart = codeEl.selectionEnd = start + 4;
+    syncGutter();
+  }
+  if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+    event.preventDefault();
+    run();
+  }
+});
+
+function setStatus(kind, message) {
+  const cls = kind === "ok" ? "ok" : kind === "bad" ? "bad" : kind === "warn" ? "warn" : "";
+  const textClass = kind === "ok" ? "status-ok" : kind === "bad" ? "status-bad" : "";
+  statusEl.innerHTML = "";
+
+  const dot = document.createElement("span");
+  dot.className = "dot " + cls;
+  statusEl.appendChild(dot);
+
+  const label = document.createElement("span");
+  label.className = textClass;
+  label.textContent = message;
+  statusEl.appendChild(label);
+}
+
+function renderTabs() {
+  tabsEl.innerHTML = "";
+
+  const present = ERROR_PHASES.filter(([, key]) => sections[key] !== undefined);
+  const all = present.concat(PHASES);
+
+  for (const [label, key] of all) {
+    const body = sections[key];
+    const tab = document.createElement("button");
+    tab.className = "tab";
+    tab.setAttribute("role", "tab");
+    tab.textContent = label;
+
+    const isError = ERROR_PHASES.some(([l]) => l === label);
+    if (isError) tab.classList.add("error");
+    if (body === undefined || body.trim() === "") tab.classList.add("empty");
+
+    tab.setAttribute("aria-selected", String(label === activeTab));
+    tab.addEventListener("click", () => { activeTab = label; renderTabs(); renderBody(); });
+    tabsEl.appendChild(tab);
+  }
+}
+
+function renderBody() {
+  const all = ERROR_PHASES.concat(PHASES);
+  const entry = all.find(([label]) => label === activeTab);
+  const body = entry ? sections[entry[1]] : undefined;
+
+  outputEl.innerHTML = "";
+
+  if (body === undefined) {
+    const span = document.createElement("span");
+    span.className = "placeholder";
+    span.textContent = "This phase produced no output for the last run.";
+    outputEl.appendChild(span);
+    return;
+  }
+
+  // textContent, never innerHTML: compiler output is data, not markup.
+  outputEl.textContent = body === "" ? "(empty)" : body;
+}
+
+async function run() {
+  runBtn.disabled = true;
+  setStatus("", "Compiling…");
+
+  try {
+    const response = await fetch("/api/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ source: codeEl.value }),
+    });
+
+    const result = await response.json();
+
+    if (!result.ok) {
+      sections = {};
+      renderTabs();
+      outputEl.innerHTML = "";
+      outputEl.textContent = result.fatal || "The compiler could not be run.";
+      setStatus("bad", result.timeout ? "Stopped: execution timed out" : "Could not run");
+      return;
+    }
+
+    sections = result.sections || {};
+
+    // Land on the first error tab when something failed, otherwise on Output.
+    const firstError = ERROR_PHASES.find(([, key]) => sections[key] !== undefined);
+    activeTab = firstError ? firstError[0] : "Output";
+
+    renderTabs();
+    renderBody();
+
+    const notes = (result.notes || []).join("  ·  ");
+    if (result.exitCode === 0) {
+      setStatus("ok", notes || "Completed successfully");
+    } else if (result.hasErrors) {
+      setStatus("bad", notes || "Compilation failed");
+    } else {
+      setStatus("warn", notes || ("Exited with code " + result.exitCode));
+    }
+  } catch (error) {
+    setStatus("bad", "Could not reach the playground server. Is it still running?");
+  } finally {
+    runBtn.disabled = false;
+  }
+}
+
+runBtn.addEventListener("click", run);
+
+async function loadExamples() {
+  try {
+    const response = await fetch("/api/examples");
+    const list = await response.json();
+
+    for (const example of list) {
+      const option = document.createElement("option");
+      option.value = example.name;
+      option.textContent = example.name;
+      option.dataset.source = example.source;
+      examplesEl.appendChild(option);
+    }
+  } catch (error) {
+    // A missing examples directory is not worth interrupting the user over.
+  }
+}
+
+examplesEl.addEventListener("change", () => {
+  const option = examplesEl.selectedOptions[0];
+  if (option && option.dataset.source !== undefined) {
+    codeEl.value = option.dataset.source;
+    syncGutter();
+    run();
+  }
+  examplesEl.selectedIndex = 0;
+});
+
+codeEl.value = STARTER;
+syncGutter();
+loadExamples();
+run();
+</script>
+
+</body>
+</html>
